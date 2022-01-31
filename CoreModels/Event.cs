@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,9 +16,11 @@ namespace CoreModels
         public District District { get; set; }
 
         [NotMapped]
+        [JsonIgnore]
         private string body;
 
         [NotMapped]
+        [JsonIgnore]
         public string Body 
         {
             get { return body; }
