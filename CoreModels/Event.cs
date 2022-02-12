@@ -13,7 +13,7 @@ namespace CoreModels
         public string Title { get; set; }
         public string IncidentCategory {get;set;}
         public DateTime DateOfDownload { get; set; }
-        public District District { get; set; }
+        public string DistrictName { get; set; }
 
         [NotMapped]
         [JsonIgnore]
