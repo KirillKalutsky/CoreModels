@@ -9,7 +9,7 @@ namespace CoreModels
     {
         [Key]
         public string Link { get; set; }
-        public Source Source { get; set; }
+        public int IdSource { get; set; }
         public string Title { get; set; }
         public string IncidentCategory {get;set;}
         public DateTime DateOfDownload { get; set; }
