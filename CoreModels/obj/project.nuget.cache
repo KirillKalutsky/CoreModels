@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "XoGeRdjYh3O44rSPfEPn+1T8lWUycl78GHDrRx8aELHM+3tdL8LMNF0liZMWN31RpJxX+pYqvikSa/8/2VD0jQ==",
+  "dgSpecHash": "uVDh4GBsmUB+VpOO30wFsgF6JOwXnNK3se7rf+gJ3blzXjOp7cvzWsYP1ficnsxTFgHGcBuw38B9TIFEPuDfxA==",
   "success": true,
-  "projectFilePath": "D:\\ВКР\\Soft\\CoreModels\\CoreModels\\CoreModels.csproj",
+  "projectFilePath": "D:\\ВКР\\Soft\\WebCrawler\\CoreModels\\CoreModels\\CoreModels.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\5.0.0\\microsoft.windowsdesktop.app.ref.5.0.0.nupkg.sha512"
   ],
