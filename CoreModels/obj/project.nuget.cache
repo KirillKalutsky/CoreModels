@@ -1,10 +1,18 @@
 {
   "version": 2,
-  "dgSpecHash": "uVDh4GBsmUB+VpOO30wFsgF6JOwXnNK3se7rf+gJ3blzXjOp7cvzWsYP1ficnsxTFgHGcBuw38B9TIFEPuDfxA==",
+  "dgSpecHash": "047BZbZ3pA59E7TnkWJ5IGL3+wghyXc2mRAK+OQvH16IjiyWH5slint5OWRcdurr0Zas1YCUxcnsGQ9XjFNpOA==",
   "success": true,
   "projectFilePath": "D:\\ВКР\\Soft\\WebCrawler\\CoreModels\\CoreModels\\CoreModels.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Asus\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\5.0.0\\microsoft.windowsdesktop.app.ref.5.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Ошибка чтения файла кэша D:\\ВКР\\Soft\\WebCrawler\\CoreModels\\CoreModels\\obj\\project.nuget.cache: Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

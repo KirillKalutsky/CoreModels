@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,16 +9,18 @@ namespace CoreModels
     {
         [Key]
         public string Link { get; set; }
-        public Source Source { get; set; }
+        public int IdSource { get; set; }
         public string Title { get; set; }
         public string IncidentCategory {get;set;}
         public DateTime DateOfDownload { get; set; }
-        public District District { get; set; }
+        public string DistrictName { get; set; }
 
         [NotMapped]
+        [JsonIgnore]
         private string body;
 
         [NotMapped]
+        [JsonIgnore]
         public string Body 
         {
             get { return body; }

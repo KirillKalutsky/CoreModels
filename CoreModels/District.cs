@@ -20,5 +20,23 @@ namespace CoreModels
         public string DistrictName  { get; set; }
         public List<Address> Addresses { get; set; }
         public List<Event> Events { get; set; }
+
+        public override int GetHashCode()
+        {
+            return DistrictName.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is District))
+                return false;
+
+            return ((District)obj).DistrictName.Equals(DistrictName);
+        }
+
+        public override string ToString()
+        {
+            return $"{DistrictName}";
+        }
     }
 }

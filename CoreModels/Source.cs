@@ -17,5 +17,18 @@ namespace CoreModels
         {
             return $"Source {Id} - {SourceType}";
         }
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Source))
+                return false;
+
+            return ((Source)obj).Id.Equals(Id);
+        }
+
     }
 }
