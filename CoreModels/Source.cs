@@ -6,8 +6,14 @@ namespace CoreModels
 {
     public class Source
     {
+        private static int id;
+        public Source()
+        {
+            Id = id;
+            id++;
+        }
+
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public SourceType SourceType { get; set; }
         public List<Event> Events { get; set; }
