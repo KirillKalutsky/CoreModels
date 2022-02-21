@@ -1,6 +1,10 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "fygWmERrcrEKAReUK4TNslD8Cv8ejhWTR8AL28BsB2LJ+BV8jQz1RAhDAQY3iAf5JUAOrs96OYP5uNLV1nmX0Q==",
+=======
+  "dgSpecHash": "fZdqcuqA9HVdLUPOF/94MbmNcSslRfhhmHLHM+yowdvd1iTshFYw1XijEmXa0FsbdsnRTtmO2/bQxVyxmpYUeA==",
+>>>>>>> origin/master
   "success": true,
   "projectFilePath": "D:\\ВКР\\Soft\\WebCrawler\\CoreModels\\CoreModels\\CoreModels.csproj",
   "expectedPackageFiles": [
