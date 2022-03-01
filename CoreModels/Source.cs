@@ -16,7 +16,7 @@ namespace CoreModels
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
         public SourceType SourceType { get; set; }
-        public List<Event> Events { get; set; }
+        public IEnumerable<Event> Events { get; set; }
         public SourceFields Fields { get; set; }
 
         public override string ToString()
