@@ -7,6 +7,11 @@ namespace CoreModels
 {
     public class Event
     {
+        public Event()
+        {
+            DateOfDownload = DateTime.Now;
+        }
+
         [Key]
         public string Link { get; set; }
         public int IdSource { get; set; }

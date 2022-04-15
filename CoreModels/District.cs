@@ -18,8 +18,8 @@ namespace CoreModels
 
         [Key]
         public string DistrictName  { get; set; }
-        public List<Address> Addresses { get; set; }
-        public List<Event> Events { get; set; }
+        public IEnumerable<Address> Addresses { get; set; }
+        public IEnumerable<Event> Events { get; set; }
 
         public override int GetHashCode()
         {
