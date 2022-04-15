@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace CoreModels
 {
-    public class UpdateSourcePropertiesDto
+    public class UpdateCrawbleSourceDto
     {
-        public string Properties { get; set; }
+        public string lastEventLink { get; set; }
     }
 }
