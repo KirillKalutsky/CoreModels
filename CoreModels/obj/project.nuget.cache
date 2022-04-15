@@ -1,11 +1,18 @@
 {
   "version": 2,
-  "dgSpecHash": "BJ1PICsh2FMH1w9XwABNZdWZdAjjVgtCoeHbY5iPuqO8L4NY6Bm3qSYz3SI+unCeWx9BrLdy2YEpyO8j07d/RQ==",
+  "dgSpecHash": "eCrSo5kxtNQrXJtuQdA8SKqQizoQXxJbTlRz7VdA+bm+goG28tUf7vBy5Mz++1Qwrysu9HVlKNPg1df0ncZzSQ==",
   "success": true,
-  "projectFilePath": "D:\\ВКР\\Soft\\CoreModels\\CoreModels\\CoreModels.csproj",
+  "projectFilePath": "D:\\ВКР\\Soft\\WebCrawler\\CoreModels\\CoreModels\\CoreModels.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Asus\\.nuget\\packages\\htmlagilitypack\\1.11.42\\htmlagilitypack.1.11.42.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Ошибка чтения файла кэша D:\\ВКР\\Soft\\WebCrawler\\CoreModels\\CoreModels\\obj\\project.nuget.cache: Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }
