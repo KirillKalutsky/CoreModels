@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CoreModels
 {
-    public class UpdateCrawbleSourceDto
+    public class PageArchitectureSiteDto
     {
         public string lastEventLink { get; set; }
     }
