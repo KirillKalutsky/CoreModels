@@ -23,8 +23,6 @@ namespace CoreModels.Extensions
                     foreach (var node in myNodes)
                         value.Append(node.InnerText);
                 }
-                else
-                    Debug.Print($"dont containt {e.Key} {e.Value}");
 
                 p.SetValue(result, value.ToString().ReplaceHtmlTags(string.Empty));
             }
