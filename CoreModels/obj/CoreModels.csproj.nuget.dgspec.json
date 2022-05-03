@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ВКР\\Soft\\CoreModels\\CoreModels\\CoreModels.csproj": {}
+    "D:\\c#\\test\\ConsoleApp1\\CoreModels\\CoreModels\\CoreModels.csproj": {}
   },
   "projects": {
-    "D:\\ВКР\\Soft\\CoreModels\\CoreModels\\CoreModels.csproj": {
+    "D:\\c#\\test\\ConsoleApp1\\CoreModels\\CoreModels\\CoreModels.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ВКР\\Soft\\CoreModels\\CoreModels\\CoreModels.csproj",
+        "projectUniqueName": "D:\\c#\\test\\ConsoleApp1\\CoreModels\\CoreModels\\CoreModels.csproj",
         "projectName": "CoreModels",
-        "projectPath": "D:\\ВКР\\Soft\\CoreModels\\CoreModels\\CoreModels.csproj",
+        "projectPath": "D:\\c#\\test\\ConsoleApp1\\CoreModels\\CoreModels\\CoreModels.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\ВКР\\Soft\\CoreModels\\CoreModels\\obj\\",
+        "outputPath": "D:\\c#\\test\\ConsoleApp1\\CoreModels\\CoreModels\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -54,6 +54,10 @@
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.1, )"
+            },
+            "TinyCsvParser": {
+              "target": "Package",
+              "version": "[2.6.1, )"
             }
           },
           "imports": [
@@ -71,7 +75,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     }

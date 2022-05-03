@@ -22,6 +22,7 @@ namespace WebCrawler
         private string currentEventLink;
         private int currentSeanceCrawledEventCount;
 
+        
         public PageUrlCreator pageUrlCreator { get; set; }
         public IPageParser eventsUrlParser { get; set; }
 

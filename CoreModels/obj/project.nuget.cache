@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "BJ1PICsh2FMH1w9XwABNZdWZdAjjVgtCoeHbY5iPuqO8L4NY6Bm3qSYz3SI+unCeWx9BrLdy2YEpyO8j07d/RQ==",
+  "dgSpecHash": "zjObC4wLicwLfLmnj+AOKHGis6pALttZg9w1Uaa805qyuifVznnJh0n84gPWUTfOsoDAuX0NndzQlYnZ4Zl/MQ==",
   "success": true,
-  "projectFilePath": "D:\\ВКР\\Soft\\CoreModels\\CoreModels\\CoreModels.csproj",
+  "projectFilePath": "D:\\c#\\test\\ConsoleApp1\\CoreModels\\CoreModels\\CoreModels.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Asus\\.nuget\\packages\\htmlagilitypack\\1.11.42\\htmlagilitypack.1.11.42.nupkg.sha512",
-    "C:\\Users\\Asus\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
+    "C:\\Users\\Asus\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
+    "C:\\Users\\Asus\\.nuget\\packages\\tinycsvparser\\2.6.1\\tinycsvparser.2.6.1.nupkg.sha512"
   ],
   "logs": []
 }

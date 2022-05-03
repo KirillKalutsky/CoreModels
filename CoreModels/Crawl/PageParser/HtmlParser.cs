@@ -10,7 +10,7 @@ namespace CoreModels.Crawl
 {
     public class HtmlParser : IPageParser
     {
-        public HtmlElement LinkElement { get; set; }
+        private HtmlElement LinkElement;
         public HtmlParser(HtmlElement linkElement)
         {
             LinkElement = linkElement;
