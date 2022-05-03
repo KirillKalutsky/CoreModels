@@ -9,6 +9,7 @@ using CoreModels.Extensions;
 using System.Text;
 using CoreModels.Crawl;
 using CoreModels.Crawl.UrlCreator;
+using CoreModels.Crawl.PageParser;
 
 namespace WebCrawler
 {
@@ -22,8 +23,8 @@ namespace WebCrawler
         private string currentEventLink;
         private int currentSeanceCrawledEventCount;
 
-        public PageUrlCreator pageUrlCreator { get; set; }
-        public IPageParser eventsUrlParser { get; set; }
+        public Func<int, string> getPageUrl{ get; set; }
+        public Func<string, IEnumerable<string>> getEventsUrl { get; set; }
 
         public override async IAsyncEnumerable<Event> CrawlAsync(int? maxCountEvents, HttpClient httpClient)
         {
@@ -35,7 +36,7 @@ namespace WebCrawler
 
             while (isCrawl)
             {
-                var url = pageUrlCreator.CreatePageUrl(pageCounter);
+                var url = getPageUrl(pageCounter);
 
                 HttpResponseMessage page;
                 try
@@ -54,7 +55,7 @@ namespace WebCrawler
                 }
 
                 var pageContent = await page.Content.ReadAsStringAsync();
-                var pageLinks = eventsUrlParser.ParsePageContent(pageContent);//await PageLoader.GetPageElementAsync(page, LinkElement);
+                var pageLinks = getEventsUrl(pageContent);//await PageLoader.GetPageElementAsync(page, LinkElement);
                 pageCounter++;
                 var events = new Dictionary<Task<HttpResponseMessage>, string>();
                 foreach (var link in pageLinks)

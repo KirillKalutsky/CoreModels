@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CoreModels.Crawl
+namespace CoreModels.Crawl.UrlCreator
 {
-    public class JsonParser : IPageParser
+    public class DatePageUrlCreator : PageUrlCreator
     {
-        public IEnumerable<string> ParsePageContent(string pageContent)
+        public override string CreatePageUrl(int pageNumber)
         {
             throw new NotImplementedException();
         }
