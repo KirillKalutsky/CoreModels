@@ -5,9 +5,13 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using CoreModels;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace WebCrawler
 {
+    
     public abstract class CrawlableSource
     {
         //главный метод обхода сайта, этот обход должен заканчиваться в определенный момент
@@ -23,5 +27,50 @@ namespace WebCrawler
 
         //метод который будет узменять состояние флага, при достижении определенных условий, определяемых в наследнике
         protected abstract bool StopCrawl();
+    }
+
+    public class BaseSpecifiedConcreteClassConverter : DefaultContractResolver
+    {
+        protected override JsonConverter ResolveContractConverter(Type objectType)
+        {
+            if (typeof(CrawlableSource).IsAssignableFrom(objectType) && !objectType.IsAbstract)
+                return null; // pretend TableSortRuleConvert is not specified (thus avoiding a stack overflow)
+            return base.ResolveContractConverter(objectType);
+        }
+    }
+
+    public class BaseConverter : JsonConverter
+    {
+        static JsonSerializerSettings SpecifiedSubclassConversion = new JsonSerializerSettings() { ContractResolver = new BaseSpecifiedConcreteClassConverter() };
+
+        public override bool CanConvert(Type objectType)
+        {
+            return (objectType == typeof(CrawlableSource));
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            JObject jo = JObject.Load(reader);
+            switch (jo["ObjType"].Value<int>())
+            {
+                case 1:
+                    return JsonConvert.DeserializeObject<PageArchitectureSite>(jo.ToString(), SpecifiedSubclassConversion);
+                /*case 2:
+                    return JsonConvert.DeserializeObject<DerivedType2>(jo.ToString(), SpecifiedSubclassConversion);*/
+                default:
+                    throw new Exception();
+            }
+            throw new NotImplementedException();
+        }
+
+        public override bool CanWrite
+        {
+            get { return false; }
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            throw new NotImplementedException(); // won't be called because CanWrite returns false
+        }
     }
 }
