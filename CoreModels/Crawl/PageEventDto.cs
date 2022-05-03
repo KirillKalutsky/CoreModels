@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace CoreModels.Crawl
 {
-    internal class PageEventDto
+    public class PageEventDto
     {
+        public string Title { get; set; }
+        public string Content { get; set; }
+        public string Link { get; set; }
     }
 }

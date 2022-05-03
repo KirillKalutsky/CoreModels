@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace CoreModels.Crawl
 {
-    internal class PageParser
+    public interface IPageParser
     {
+        IEnumerable<string> ParsePageContent(string pageContent);
     }
 }

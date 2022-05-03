@@ -10,7 +10,6 @@ namespace WebCrawler
 {
     public abstract class CrawlableSource
     {
-        public string lastEventLink { get; set; }
         //главный метод обхода сайта, этот обход должен заканчиваться в определенный момент
         //сделаю флаг, "Crawl", пока он true то обход продолжается
         public abstract IAsyncEnumerable<Event> CrawlAsync(int? maxCountEvents, HttpClient httpClient);
@@ -20,13 +19,9 @@ namespace WebCrawler
         //по логике должен изменяться когда мы натыкаемся на ссылку статьи которая у нас уже есть в базе
         //но если мы парсим этот источник впервый раз то должна быть другая причина чтобы остановиться, например количество уже распаршенных новостей или дата рассматриваемой новости
         //
-        protected bool isCrawl;
+        public bool isCrawl { get; protected set; }
 
         //метод который будет узменять состояние флага, при достижении определенных условий, определяемых в наследнике
-        public abstract bool StopCrawl();
-
-        //id источника для соотношения с объектом из БД
-        public int SourseId { get; set; }
-
+        protected abstract bool StopCrawl();
     }
 }

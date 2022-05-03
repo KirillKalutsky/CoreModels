@@ -5,20 +5,25 @@ using System.Threading.Tasks;
 using CoreModels;
 using System.Net.Http;
 using System;
+using CoreModels.Extensions;
+using System.Text;
+using CoreModels.Crawl;
+using CoreModels.Crawl.UrlCreator;
 
 namespace WebCrawler
 {
     public class PageArchitectureSite : CrawlableSource
     {
-        public string StartUrl { get; set; }
-        public string EndUrl { get; set; }
-        public string LinkURL { get; set; }
-        public HtmlElement LinkElement { get; set; }
+        public string LastEventLink { get; set; }
+        
         public Dictionary<string, string> ParseEventProperties { get; set; }
 
         private int? maxCountEvents;
         private string currentEventLink;
-        int currentSeanceCrawledEventCount;
+        private int currentSeanceCrawledEventCount;
+
+        public PageUrlCreator pageUrlCreator { get; set; }
+        public IPageParser eventsUrlParser { get; set; }
 
         public override async IAsyncEnumerable<Event> CrawlAsync(int? maxCountEvents, HttpClient httpClient)
         {
@@ -27,33 +32,36 @@ namespace WebCrawler
             var pageCounter = 1;
             isCrawl = true;
             var errors = new List<Exception>();
+
             while (isCrawl)
             {
-                var url = $"{StartUrl}{pageCounter}{EndUrl}";
+                var url = pageUrlCreator.CreatePageUrl(pageCounter);
 
                 HttpResponseMessage page;
                 try
                 {
-                    page = await PageLoader.LoadPageAsync(httpClient, url, HttpMethod.Get);
+                    page = await httpClient.LoopSendingAsync(url, HttpMethod.Get);
                 }
-                catch (Exception e)
+                catch (Exception exc)
                 {
-                    yield break;
+                    errors.Add(exc);
+                    break;
                 }
 
                 if (!page.IsSuccessStatusCode)
                 {
-                    yield break;
+                    break;
                 }
 
-                var pageLinks = await PageLoader.GetPageElementAsync(page, LinkElement);
+                var pageContent = await page.Content.ReadAsStringAsync();
+                var pageLinks = eventsUrlParser.ParsePageContent(pageContent);//await PageLoader.GetPageElementAsync(page, LinkElement);
                 pageCounter++;
                 var events = new Dictionary<Task<HttpResponseMessage>, string>();
                 foreach (var link in pageLinks)
                 {
-                    var fullLink = $"{LinkURL}{link}";
+                    //var fullLink = $"{LinkURL}{link}";
 
-                    currentEventLink = fullLink;
+                    currentEventLink = link;
                     currentSeanceCrawledEventCount += 1;
 
                     if (isCrawl)
@@ -62,7 +70,7 @@ namespace WebCrawler
                     Task<HttpResponseMessage> content;
                     try
                     {
-                        content = httpClient.LoadPageAsync(fullLink, HttpMethod.Get);
+                        content = httpClient.LoopSendingAsync(link, HttpMethod.Get);
                     }
                     catch (Exception e)
                     {
@@ -70,7 +78,7 @@ namespace WebCrawler
                         continue;
                     }
 
-                    events[content] = fullLink;
+                    events[content] = link;
                 }
 
                 while (events.Any())
@@ -79,36 +87,66 @@ namespace WebCrawler
                     var link = events[tP];
                     events.Remove(tP);
 
-                    var p = await tP;
+                    HttpResponseMessage p;
+                    try
+                    {
+                        p = await tP;
+                    }
+                    catch(Exception ex)
+                    {
+                        errors.Add(ex);
+                        p = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+                    }
                     if (!p.IsSuccessStatusCode)
                     {
                         continue;
                     }
 
                     HtmlDocument document = new HtmlDocument();
-                    document.LoadHtml(await p.Content.ReadAsStringAsync());
+                    var stringContent = await p.Content.ReadAsStringAsync();
+                    document.LoadHtml(stringContent);
 
-                    var news = document.ParseHtmlPage(ParseEventProperties);
+                    var news = ParseHtmlPage(document, ParseEventProperties);
 
                     news.Link = link;
-                    news.IdSource = SourseId;
 
                     yield return news;
                 }
-
             }
 
             if (errors.Any())
                 throw new AggregateException(errors);
         }
 
-        public override bool StopCrawl()
+        protected override bool StopCrawl()
         {
-            if (lastEventLink != null)
-                return currentEventLink.Equals(lastEventLink);
+            if (LastEventLink != null)
+                return currentEventLink.Equals(LastEventLink);
             if (maxCountEvents != null)
                 return currentSeanceCrawledEventCount >= maxCountEvents;
             return false;
+        }
+
+        private Event ParseHtmlPage(HtmlDocument page, Dictionary<string, string> pageElements)
+        {
+            var result = new Event();
+            foreach (var e in pageElements)
+            {
+                var p = result.GetType().GetProperty(e.Key);
+                var value = new StringBuilder();
+
+                var nodes = page.DocumentNode;
+                var myNodes = nodes.SelectNodes(e.Value);
+
+                if (myNodes != null)
+                {
+                    foreach (var node in myNodes)
+                        value.Append(node.InnerText);
+                }
+
+                p.SetValue(result, value.ToString().ReplaceHtmlTags(string.Empty));
+            }
+            return result;
         }
     }
 }

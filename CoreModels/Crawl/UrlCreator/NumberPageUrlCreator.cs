@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace CoreModels.Crawl.UrlCreator
 {
-    internal class NumberPageUrlCreator
+    public class NumberPageUrlCreator : PageUrlCreator
     {
+        public override string CreatePageUrl(int pageNumber)
+        {
+            return $"{StartUrl}{pageNumber}{EndUrl}";
+        }
     }
 }

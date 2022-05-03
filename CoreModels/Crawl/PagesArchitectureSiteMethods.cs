@@ -1,8 +1,9 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebCrawler;
 
 namespace CoreModels.Crawl
 {
@@ -16,5 +17,10 @@ namespace CoreModels.Crawl
 
     }
 
+    public static class PageUrl
+    {
+        public static string GetUrl(this MethodGetPageUrl, PageArchitectureSite)
+    }
 
 }
+*/
