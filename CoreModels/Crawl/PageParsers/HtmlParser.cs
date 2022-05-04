@@ -17,8 +17,6 @@ namespace CoreModels.Crawl.PageParsers
 
         public override IEnumerable<string> ParsePageContent(string content)
         {
-            var result = new List<string>();
-            
             var doc = new HtmlDocument();
             doc.LoadHtml(content);
 
@@ -28,12 +26,10 @@ namespace CoreModels.Crawl.PageParsers
                 foreach (var e in searchElements)
                 {
                     var l = e.GetAttributeValue(LinkElement.AttributeName, "");
-                    result.Add(l);
+                    yield return $"{LinkURL}{l}";
                 }
             else
                 throw new HtmlElementNotFoundException($"{content} : элементы не найдены");
-            
-            return result;
         }
 
     }
