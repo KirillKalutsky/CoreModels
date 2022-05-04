@@ -5,11 +5,7 @@ using System.Threading.Tasks;
 using CoreModels;
 using System.Net.Http;
 using System;
-using CoreModels.Extensions;
 using System.Text;
-using CoreModels.Crawl;
-using CoreModels.Crawl.UrlCreator;
-using CoreModels.Crawl.PageParser;
 
 namespace WebCrawler
 {

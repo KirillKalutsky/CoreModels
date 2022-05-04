@@ -1,11 +1,9 @@
-﻿using CoreModels.Crawl.PageParser;
+﻿using CoreModels.Crawl.PageParsers;
 using CoreModels.Crawl.UrlCreator;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace CoreModels.Crawl
 {
@@ -25,7 +23,7 @@ namespace CoreModels.Crawl
         public static Func<string, IEnumerable<string>> GetFunc(
             this TypePageParser typePageParser, string serializedPageParser)
         {
-            IPageParser result;
+            PageParser result;
             switch (typePageParser)
             {
                 case TypePageParser.HtmlParser:

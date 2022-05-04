@@ -2,14 +2,11 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebCrawler;
 
-namespace CoreModels.Crawl
+namespace CoreModels.Crawl.PageParsers
 {
-    public class HtmlParser : IPageParser
+    public class HtmlParser : PageParser
     {
         [JsonProperty]
         private HtmlElement LinkElement;
@@ -18,7 +15,7 @@ namespace CoreModels.Crawl
             LinkElement = linkElement;
         }
 
-        public IEnumerable<string> ParsePageContent(string content)
+        public override IEnumerable<string> ParsePageContent(string content)
         {
             var result = new List<string>();
             
@@ -38,6 +35,7 @@ namespace CoreModels.Crawl
             
             return result;
         }
+
     }
     public class HtmlElementNotFoundException : Exception
     {
