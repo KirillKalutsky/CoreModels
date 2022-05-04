@@ -10,7 +10,8 @@ namespace WebCrawler
 {
     public static class PageLoader
     {
-        public static async Task<HttpResponseMessage> TrySendAsync(this HttpClient httpClient, string address, HttpMethod httpMethod, string content = null)
+        public static async Task<HttpResponseMessage> TrySendAsync(
+            this HttpClient httpClient, string address, HttpMethod httpMethod, string content = null)
         {
             HttpResponseMessage responseRes;
             try
@@ -22,13 +23,14 @@ namespace WebCrawler
             }
             catch (HttpRequestException exp)
             {
-                throw exp;
+                throw;
             }
 
             return responseRes;
         }
 
-        public static async Task<HttpResponseMessage> LoadPageAsync(this HttpClient httpClient, string url, HttpMethod method, int numberOfAttempts = 5, string content = null)
+        public static async Task<HttpResponseMessage> LoopSendingAsync(this HttpClient httpClient,
+            string url, HttpMethod method, int numberOfAttempts = 5, string content = null)
         {
             HttpResponseMessage result = null;
             for (var i = 0; i < numberOfAttempts; i++)
@@ -39,7 +41,7 @@ namespace WebCrawler
                 }
                 catch (Exception exc)
                 {
-                    throw exc;
+                    throw;
                 }
                 if (result.IsSuccessStatusCode || numberOfAttempts == 0)
                     break;
@@ -49,13 +51,20 @@ namespace WebCrawler
             return result;
         }
 
-
-
-        public static async Task<IEnumerable<string>> GetPageElementAsync(this HttpClient httpClient, string url, HtmlElement link)
+/*        public static async Task<IEnumerable<string>> GetPageElementAsync(
+            this HttpClient httpClient, string url, HtmlElement link)
         {
             var result = new List<string>();
 
-            var body = (await PageLoader.LoadPageAsync(httpClient, url, HttpMethod.Get));
+            HttpResponseMessage body;
+            try
+            {
+                body = await LoopSendingAsync(httpClient, url, HttpMethod.Get);
+            }
+            catch(Exception exc)
+            {
+                throw;
+            }
 
             if (body.IsSuccessStatusCode)
             {
@@ -71,15 +80,15 @@ namespace WebCrawler
                         result.Add(l);
                     }
                 else
-                {
-                    Console.WriteLine($"{url} : элементы не найдены");
-                    Debug.Print($"{url} : элементы не найдены");
-                }
+                    throw new HtmlElementNotFoundException($"{url} : элементы не найдены");
             }
             return result;
-        }
+        }*/
 
-        public static async Task<IEnumerable<string>> GetPageElementAsync(this HttpResponseMessage body, HtmlElement link)
+        
+
+        public static async Task<IEnumerable<string>> GetPageElementAsync(
+            this HttpResponseMessage body, HtmlElement link)
         {
             var result = new List<string>();
 
