@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace CoreModels.Crawl
 {
     public class HtmlParser : IPageParser
     {
+        [JsonProperty]
         private HtmlElement LinkElement;
         public HtmlParser(HtmlElement linkElement)
         {
