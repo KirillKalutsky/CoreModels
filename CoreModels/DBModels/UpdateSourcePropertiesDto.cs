@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CoreModels
 {
-    public class PageArchitectureSiteDto
+    public class UpdatePageArchitectureSiteDto
     {
         public string lastEventLink { get; set; }
     }

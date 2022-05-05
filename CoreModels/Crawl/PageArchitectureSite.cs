@@ -9,119 +9,146 @@ using System.Text;
 
 namespace WebCrawler
 {
-    public class PageArchitectureSite : CrawlableSource
+    public class PageArchitectureSite : ICrawlableSource
     {
         public string LastEventLink { get; set; }
-        
         public Dictionary<string, string> ParseEventProperties { get; set; }
-
-        private int? maxCountEvents;
-        private string currentEventLink;
-        private int currentSeanceCrawledEventCount;
-
         public Func<int, string> getPageUrl{ get; set; }
         public Func<string, IEnumerable<string>> getEventsUrl { get; set; }
 
-        public override async IAsyncEnumerable<Event> CrawlAsync(int? maxCountEvents, HttpClient httpClient)
+        private int currentSeanceCrawledEventCount;
+        private bool isCrawl;
+        private HttpClient httpClient;
+        private List<Exception> exceptions;
+
+        public async IAsyncEnumerable<Event> CrawlAsync(HttpClient httpClient, int maxCountEvents)
         {
-            this.maxCountEvents = maxCountEvents;
+            this.httpClient = httpClient;
             currentSeanceCrawledEventCount = 0;
             var pageCounter = 1;
             isCrawl = true;
-            var errors = new List<Exception>();
+            exceptions = new List<Exception>();
 
             while (isCrawl)
             {
-                var url = getPageUrl(pageCounter);
-
-                HttpResponseMessage page;
-                try
-                {
-                    page = await httpClient.LoopSendingAsync(url, HttpMethod.Get);
-                }
-                catch (Exception exc)
-                {
-                    errors.Add(exc);
-                    break;
-                }
-
-                if (!page.IsSuccessStatusCode)
-                {
-                    break;
-                }
-
-                var pageContent = await page.Content.ReadAsStringAsync();
-                var pageLinks = getEventsUrl(pageContent);//await PageLoader.GetPageElementAsync(page, LinkElement);
+                var pageLinks = await GetEventsUri(pageCounter);
                 pageCounter++;
-                var events = new Dictionary<Task<HttpResponseMessage>, string>();
-                foreach (var link in pageLinks)
-                {
-                    //var fullLink = $"{LinkURL}{link}";
 
-                    currentEventLink = link;
-                    currentSeanceCrawledEventCount += 1;
+                var events = DownloadEventsContext(pageLinks, maxCountEvents);
 
-                    if (isCrawl)
-                        isCrawl = !StopCrawl();
-
-                    Task<HttpResponseMessage> content;
-                    try
-                    {
-                        content = httpClient.LoopSendingAsync(link, HttpMethod.Get);
-                    }
-                    catch (Exception e)
-                    {
-                        errors.Add(e);
-                        continue;
-                    }
-
-                    events[content] = link;
-                }
-
-                while (events.Any())
-                {
-                    var tP = await Task.WhenAny(events.Keys);
-                    var link = events[tP];
-                    events.Remove(tP);
-
-                    HttpResponseMessage p;
-                    try
-                    {
-                        p = await tP;
-                    }
-                    catch(Exception ex)
-                    {
-                        errors.Add(ex);
-                        p = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
-                    }
-                    if (!p.IsSuccessStatusCode)
-                    {
-                        continue;
-                    }
-
-                    HtmlDocument document = new HtmlDocument();
-                    var stringContent = await p.Content.ReadAsStringAsync();
-                    document.LoadHtml(stringContent);
-
-                    var news = ParseHtmlPage(document, ParseEventProperties);
-
-                    news.Link = link;
-
-                    yield return news;
-                }
+                await foreach (var ev in GetEventFromResponse(events))
+                    yield return ev;
             }
 
-            if (errors.Any())
-                throw new AggregateException(errors);
+            if (exceptions.Any())
+                throw new AggregateException(exceptions);
         }
 
-        protected override bool StopCrawl()
+        private bool StopCrawl(string currentEventLink, int maxCountEvents)
         {
             if (LastEventLink != null)
                 return currentEventLink.Equals(LastEventLink);
-            if (maxCountEvents != null)
-                return currentSeanceCrawledEventCount >= maxCountEvents;
-            return false;
+            
+            return currentSeanceCrawledEventCount >= maxCountEvents;
+        }
+
+        private async Task<IEnumerable<string>> GetEventsUri(int pageNumber)
+        {
+            var url = getPageUrl(pageNumber);
+
+            HttpResponseMessage page;
+            try
+            {
+                page = await httpClient.LoopSendingAsync(url, HttpMethod.Get);
+            }
+            catch (Exception exc)
+            {
+                page = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+                exceptions.Add(exc);
+                isCrawl = false;
+            }
+
+            if (!page.IsSuccessStatusCode)
+                isCrawl = false;
+
+            string pageContent;
+            try
+            {
+                pageContent = await page.Content.ReadAsStringAsync();
+            }
+            catch (Exception exc)
+            {
+                pageContent = String.Empty;
+                exceptions.Add(exc);
+                isCrawl = false;
+            }
+
+            var pageLinks = getEventsUrl(pageContent);
+
+            return pageLinks;
+        }
+
+        private Dictionary<Task<HttpResponseMessage>, string> DownloadEventsContext(
+            IEnumerable<string> pageLinks, int maxCountEvents)
+        {
+            var events = new Dictionary<Task<HttpResponseMessage>, string>();
+            foreach (var link in pageLinks)
+            {
+                currentSeanceCrawledEventCount += 1;
+
+                if (isCrawl)
+                    isCrawl = !StopCrawl(link, maxCountEvents);
+
+                Task<HttpResponseMessage> content;
+                try
+                {
+                    content = httpClient.LoopSendingAsync(link, HttpMethod.Get);
+                }
+                catch (Exception e)
+                {
+                    exceptions.Add(e);
+                    continue;
+                }
+
+                events[content] = link;
+            }
+
+            return events;
+        }
+
+        private async IAsyncEnumerable<Event> GetEventFromResponse(Dictionary<Task<HttpResponseMessage>, string> events)
+        {
+            while (events.Any())
+            {
+                var tP = await Task.WhenAny(events.Keys);
+                var link = events[tP];
+                events.Remove(tP);
+
+                HttpResponseMessage p;
+                try
+                {
+                    p = await tP;
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                    p = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+                }
+                if (!p.IsSuccessStatusCode)
+                {
+                    continue;
+                }
+
+                HtmlDocument document = new HtmlDocument();
+                var stringContent = await p.Content.ReadAsStringAsync();
+                document.LoadHtml(stringContent);
+
+                var news = ParseHtmlPage(document, ParseEventProperties);
+
+                news.Link = link;
+
+                yield return news;
+            }
         }
 
         private Event ParseHtmlPage(HtmlDocument page, Dictionary<string, string> pageElements)
@@ -145,5 +172,7 @@ namespace WebCrawler
             }
             return result;
         }
+
+        bool ICrawlableSource.IsCrawl() => isCrawl;
     }
 }
