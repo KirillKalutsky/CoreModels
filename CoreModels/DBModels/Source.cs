@@ -2,22 +2,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CoreModels
+namespace CoreModels.DBModels
 {
     public class Source
     {
-        private static int id;
-        public Source()
-        {
-            Id = id;
-            id++;
-        }
-
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public SourceType SourceType { get; set; }
-        public IEnumerable<Event> Events { get; set; }
-        public SourceFields Fields { get; set; }
+        public IEnumerable<Incident> Events { get; set; }
+
+        [Column(TypeName = "jsonb")]
+        public string SerializedProperties { get; set; }
 
         public override string ToString()
         {
@@ -36,5 +31,11 @@ namespace CoreModels
             return ((Source)obj).Id.Equals(Id);
         }
 
+        /* private static int id;
+        public Source()
+        {
+            Id = id;
+            id++;
+        }*/
     }
 }

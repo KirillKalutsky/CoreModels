@@ -2,39 +2,43 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CoreModels;
+using CoreModels.DBModels;
 using System.Net.Http;
 using System;
 using System.Text;
+using CoreModels.Crawl;
 
 namespace WebCrawler
 {
     public class PageArchitectureSite : ICrawlableSource
     {
+        public PageArchitectureSite(IHttpClientFactory httpClientFactory)
+        {
+            httpClient = httpClientFactory.CreateClient();
+        }
         public string LastEventLink { get; set; }
         public Dictionary<string, string> ParseEventProperties { get; set; }
-        public Func<int, string> getPageUrl{ get; set; }
-        public Func<string, IEnumerable<string>> getEventsUrl { get; set; }
+        public Func<int, string> pageUrl{ get; set; }
+        public Func<string, IEnumerable<string>> articleLinks { get; set; }
 
-        private int currentSeanceCrawledEventCount;
+        private int eventCount;
         private bool isCrawl;
         private HttpClient httpClient;
         private List<Exception> exceptions;
 
-        public async IAsyncEnumerable<Event> CrawlAsync(HttpClient httpClient, int maxCountEvents)
+        public async IAsyncEnumerable<IncidentDto> CrawlAsync(int maxCountEvents)
         {
-            this.httpClient = httpClient;
-            currentSeanceCrawledEventCount = 0;
+            eventCount = 0;
             var pageCounter = 1;
             isCrawl = true;
             exceptions = new List<Exception>();
 
             while (isCrawl)
             {
-                var pageLinks = await GetEventsUri(pageCounter);
+                var eventsUrl = await GetEventsUrl(pageCounter);
                 pageCounter++;
 
-                var events = DownloadEventsContext(pageLinks, maxCountEvents);
+                var events = DownloadEventsContent(eventsUrl, maxCountEvents);
 
                 await foreach (var ev in GetEventFromResponse(events))
                     yield return ev;
@@ -46,20 +50,24 @@ namespace WebCrawler
 
         private bool StopCrawl(string currentEventLink, int maxCountEvents)
         {
+            if (eventCount >= maxCountEvents)
+                return true;
+
             if (LastEventLink != null)
                 return currentEventLink.Equals(LastEventLink);
             
-            return currentSeanceCrawledEventCount >= maxCountEvents;
+            return false;
         }
 
-        private async Task<IEnumerable<string>> GetEventsUri(int pageNumber)
+        private async Task<IEnumerable<string>> GetEventsUrl(int pageNumber)
         {
-            var url = getPageUrl(pageNumber);
+            var pageUrl = this.pageUrl(pageNumber);
+            IEnumerable<string> pageLinks = new string[0];
 
             HttpResponseMessage page;
             try
             {
-                page = await httpClient.LoopSendingAsync(url, HttpMethod.Get);
+                page = await httpClient.LoopSendingAsync(pageUrl, HttpMethod.Get);
             }
             catch (Exception exc)
             {
@@ -70,31 +78,32 @@ namespace WebCrawler
 
             if (!page.IsSuccessStatusCode)
                 isCrawl = false;
-
-            string pageContent;
-            try
+            else
             {
-                pageContent = await page.Content.ReadAsStringAsync();
+                string pageContent;
+                try
+                {
+                    pageContent = await page.Content.ReadAsStringAsync();
+                }
+                catch (Exception exc)
+                {
+                    pageContent = String.Empty;
+                    exceptions.Add(exc);
+                    isCrawl = false;
+                }
+                pageLinks = articleLinks(pageContent);
             }
-            catch (Exception exc)
-            {
-                pageContent = String.Empty;
-                exceptions.Add(exc);
-                isCrawl = false;
-            }
-
-            var pageLinks = getEventsUrl(pageContent);
 
             return pageLinks;
         }
 
-        private Dictionary<Task<HttpResponseMessage>, string> DownloadEventsContext(
+        private Dictionary<Task<HttpResponseMessage>, string> DownloadEventsContent(
             IEnumerable<string> pageLinks, int maxCountEvents)
         {
             var events = new Dictionary<Task<HttpResponseMessage>, string>();
             foreach (var link in pageLinks)
             {
-                currentSeanceCrawledEventCount += 1;
+                eventCount += 1;
 
                 if (isCrawl)
                     isCrawl = !StopCrawl(link, maxCountEvents);
@@ -116,24 +125,26 @@ namespace WebCrawler
             return events;
         }
 
-        private async IAsyncEnumerable<Event> GetEventFromResponse(Dictionary<Task<HttpResponseMessage>, string> events)
+        private async IAsyncEnumerable<IncidentDto> GetEventFromResponse(
+            Dictionary<Task<HttpResponseMessage>, string> events)
         {
             while (events.Any())
             {
-                var tP = await Task.WhenAny(events.Keys);
-                var link = events[tP];
-                events.Remove(tP);
+                var tMessage = await Task.WhenAny(events.Keys);
+                var link = events[tMessage];
+                events.Remove(tMessage);
 
                 HttpResponseMessage p;
                 try
                 {
-                    p = await tP;
+                    p = await tMessage;
                 }
                 catch (Exception ex)
                 {
                     exceptions.Add(ex);
-                    p = new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+                    continue;
                 }
+
                 if (!p.IsSuccessStatusCode)
                 {
                     continue;
@@ -151,9 +162,9 @@ namespace WebCrawler
             }
         }
 
-        private Event ParseHtmlPage(HtmlDocument page, Dictionary<string, string> pageElements)
+        private IncidentDto ParseHtmlPage(HtmlDocument page, Dictionary<string, string> pageElements)
         {
-            var result = new Event();
+            var result = new IncidentDto();
             foreach (var e in pageElements)
             {
                 var p = result.GetType().GetProperty(e.Key);
@@ -173,6 +184,5 @@ namespace WebCrawler
             return result;
         }
 
-        bool ICrawlableSource.IsCrawl() => isCrawl;
     }
 }

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CoreModels
+namespace CoreModels.DBModels
 {
     public class UpdatePageArchitectureSiteDto
     {
-        public string lastEventLink { get; set; }
+        public string LastEventLink { get; set; }
     }
 }

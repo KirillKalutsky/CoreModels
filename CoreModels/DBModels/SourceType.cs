@@ -1,4 +1,4 @@
-﻿namespace CoreModels
+﻿namespace CoreModels.DBModels
 {
     public enum SourceType
     {
