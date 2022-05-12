@@ -1,11 +1,13 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Runtime.Serialization;
 
 namespace CoreModels.Crawl.UrlCreator
 {
+    [DataContract]
     public class DatePageUrlCreator : PageUrlCreator
     {
-        [JsonProperty]
+        [DataMember]
         private string datePattern;
         public DatePageUrlCreator(string datePattern)
         {

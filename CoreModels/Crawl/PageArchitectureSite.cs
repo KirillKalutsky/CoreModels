@@ -7,19 +7,28 @@ using System.Net.Http;
 using System;
 using System.Text;
 using CoreModels.Crawl;
+using CoreModels.Crawl.PageParsers;
+using CoreModels.Crawl.UrlCreator;
+using System.Runtime.Serialization;
 
 namespace WebCrawler
 {
+    [KnownType(typeof(HtmlParser)), KnownType(typeof(JsonParser))]
+    [DataContract]
     public class PageArchitectureSite : ICrawlableSource
     {
         public PageArchitectureSite(IHttpClientFactory httpClientFactory)
         {
             httpClient = httpClientFactory.CreateClient();
         }
+        [DataMember]
         public string LastEventLink { get; set; }
+        [DataMember]
         public Dictionary<string, string> ParseEventProperties { get; set; }
-        public Func<int, string> pageUrl{ get; set; }
-        public Func<string, IEnumerable<string>> articleLinks { get; set; }
+        [DataMember]
+        public PageParser parser{ get; set; }
+        [DataMember]
+        public PageUrlCreator urlCreator { get; set; }
 
         private int eventCount;
         private bool isCrawl;
@@ -35,12 +44,12 @@ namespace WebCrawler
 
             while (isCrawl)
             {
-                var eventsUrl = await GetEventsUrl(pageCounter);
+                var eventsUrl = await GetArticleLinksFromPage(pageCounter);
                 pageCounter++;
 
-                var events = DownloadEventsContent(eventsUrl, maxCountEvents);
+                var httpArticles = DownloadArticlesContent(eventsUrl, maxCountEvents);
 
-                await foreach (var ev in GetEventFromResponse(events))
+                await foreach (var ev in GetIncidentsFromResponse(httpArticles))
                     yield return ev;
             }
 
@@ -59,9 +68,9 @@ namespace WebCrawler
             return false;
         }
 
-        private async Task<IEnumerable<string>> GetEventsUrl(int pageNumber)
+        private async Task<IEnumerable<string>> GetArticleLinksFromPage(int pageNumber)
         {
-            var pageUrl = this.pageUrl(pageNumber);
+            var pageUrl = urlCreator.CreatePageUrl(pageNumber);
             IEnumerable<string> pageLinks = new string[0];
 
             HttpResponseMessage page;
@@ -91,13 +100,13 @@ namespace WebCrawler
                     exceptions.Add(exc);
                     isCrawl = false;
                 }
-                pageLinks = articleLinks(pageContent);
+                pageLinks = parser.ParsePageContent(pageContent);
             }
 
             return pageLinks;
         }
 
-        private Dictionary<Task<HttpResponseMessage>, string> DownloadEventsContent(
+        private Dictionary<Task<HttpResponseMessage>, string> DownloadArticlesContent(
             IEnumerable<string> pageLinks, int maxCountEvents)
         {
             var events = new Dictionary<Task<HttpResponseMessage>, string>();
@@ -125,7 +134,7 @@ namespace WebCrawler
             return events;
         }
 
-        private async IAsyncEnumerable<IncidentDto> GetEventFromResponse(
+        private async IAsyncEnumerable<IncidentDto> GetIncidentsFromResponse(
             Dictionary<Task<HttpResponseMessage>, string> events)
         {
             while (events.Any())

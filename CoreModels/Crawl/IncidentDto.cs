@@ -17,6 +17,6 @@ namespace CoreModels.Crawl
         public string Link { get; set; }
         public string Title { get; set; }
         public DateTime DateOfDownload { get; set; }
-        public string Body { get; set; }
+        public string Text { get; set; }
     }
 }

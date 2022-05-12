@@ -8,15 +8,14 @@ namespace CoreModels.DBModels
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public SourceType SourceType { get; set; }
         public IEnumerable<Incident> Events { get; set; }
 
         [Column(TypeName = "jsonb")]
-        public string SerializedProperties { get; set; }
+        public string SerializedCrawlableSource{ get; set; }
 
         public override string ToString()
         {
-            return $"Source {Id} - {SourceType}";
+            return $"Source {Id}";
         }
         public override int GetHashCode()
         {

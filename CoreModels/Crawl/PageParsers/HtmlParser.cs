@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using System.Runtime.Serialization;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -8,9 +9,10 @@ using WebCrawler;
 
 namespace CoreModels.Crawl.PageParsers
 {
+    [DataContract]
     public class HtmlParser : PageParser
     {
-        [JsonProperty]
+        [DataMember]
         private HtmlElement LinkElement;
         public HtmlParser(HtmlElement linkElement)
         {
